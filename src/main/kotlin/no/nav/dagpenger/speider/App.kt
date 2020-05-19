@@ -20,7 +20,7 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
 import org.slf4j.LoggerFactory
 
-private val stateGauge = Gauge.build("app_status", "Gjeldende status på apps")
+private val stateGauge = Gauge.build("dp_app_status", "Gjeldende status på apps")
     .labelNames("appnavn")
     .register()
 private val logger = LoggerFactory.getLogger("no.nav.dagpenger.speider.App")

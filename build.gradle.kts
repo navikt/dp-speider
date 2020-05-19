@@ -26,8 +26,8 @@ repositories {
 }
 
 application {
-    applicationName = "dp-SERVICENAME"
-    mainClassName = "no.nav.dagpenger.SERVICENAME"
+    applicationName = "dp-speider"
+    mainClassName = "no.nav.dagpenger.speider.AppKt"
 }
 
 java {

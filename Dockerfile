@@ -1,3 +1,3 @@
 FROM navikt/java:12
 
-COPY build/libs/*.jar app.jar
+COPY build/libs/dp-speider-all.jar app.jar
