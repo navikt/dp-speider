@@ -16,8 +16,8 @@ spec:
     enabled: true
     path: /metrics
   replicas:
-    min: 2
-    max: 3
+    min: 1
+    max: 2
   resources:
     limits:
       cpu: 500m
@@ -38,4 +38,4 @@ spec:
     - name: KAFKA_CONSUMER_GROUP_ID
       value: dp-speider-v1
     - name: KAFKA_RAPID_TOPIC
-      value: privat-dagpenger-behov-v1
+      value: privat-dagpenger-behov-v2
