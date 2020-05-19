@@ -1,4 +1,4 @@
-app: dp-oppslag-arbeidsforhold
+app: dp-speider
 namespace: default
 team: teamdagpenger
-service_user: srvdp-arbforhold
+service_user: srvdp-speider
