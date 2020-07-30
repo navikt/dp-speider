@@ -1,10 +1,10 @@
 package no.nav.dagpenger.speider
 
-import java.time.LocalDateTime
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 internal class AppStatesTest {
 

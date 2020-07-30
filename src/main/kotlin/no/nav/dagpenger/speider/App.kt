@@ -2,10 +2,6 @@ package no.nav.dagpenger.speider
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.prometheus.client.Gauge
-import java.time.Duration
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit.SECONDS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -19,6 +15,10 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
 import org.slf4j.LoggerFactory
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit.SECONDS
 
 private val stateGauge = Gauge.build("dp_app_status", "Gjeldende status på apps")
     .labelNames("appnavn")
@@ -107,18 +107,22 @@ private suspend fun CoroutineScope.printerJob(rapidsConnection: RapidsConnection
             }
         }
         appStates.instances(threshold).also { report ->
-            rapidsConnection.publish(JsonMessage.newMessage(mapOf(
-                "@event_name" to "app_status",
-                "@opprettet" to LocalDateTime.now(),
-                "threshold" to threshold,
-                "states" to report.map {
-                    mapOf<String, Any>(
-                        "app" to it.key,
-                        "state" to it.value.first,
-                        "last_active_time" to it.value.second
+            rapidsConnection.publish(
+                JsonMessage.newMessage(
+                    mapOf(
+                        "@event_name" to "app_status",
+                        "@opprettet" to LocalDateTime.now(),
+                        "threshold" to threshold,
+                        "states" to report.map {
+                            mapOf<String, Any>(
+                                "app" to it.key,
+                                "state" to it.value.first,
+                                "last_active_time" to it.value.second
+                            )
+                        }
                     )
-                }
-            )).toJson())
+                ).toJson()
+            )
         }
     }
 }
