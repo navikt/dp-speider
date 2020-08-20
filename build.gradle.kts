@@ -42,6 +42,7 @@ dependencies {
     implementation(kotlin("stdlib"))
 
     implementation(RapidAndRivers)
+    implementation(Ktor.serverNetty)
 
     implementation(Konfig.konfig)
     implementation(Kotlin.Logging.kotlinLogging)
