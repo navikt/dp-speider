@@ -33,66 +33,74 @@ fun main() {
     var statusPrinterJob: Job? = null
 
     RapidApplication.create(env).apply {
-        register(object : RapidsConnection.StatusListener {
-            override fun onStartup(rapidsConnection: RapidsConnection) {
-                statusPrinterJob = GlobalScope.launch { printerJob(rapidsConnection, appStates) }
-                scheduledPingJob = GlobalScope.launch { pinger(rapidsConnection) }
-            }
+        register(
+            object : RapidsConnection.StatusListener {
+                override fun onStartup(rapidsConnection: RapidsConnection) {
+                    statusPrinterJob = GlobalScope.launch { printerJob(rapidsConnection, appStates) }
+                    scheduledPingJob = GlobalScope.launch { pinger(rapidsConnection) }
+                }
 
-            override fun onShutdown(rapidsConnection: RapidsConnection) {
-                scheduledPingJob?.cancel()
-                statusPrinterJob?.cancel()
+                override fun onShutdown(rapidsConnection: RapidsConnection) {
+                    scheduledPingJob?.cancel()
+                    statusPrinterJob?.cancel()
+                }
             }
-        })
+        )
 
         River(this).apply {
             validate { it.demandValue("@event_name", "application_up") }
             validate { it.requireKey("app_name", "instance_id") }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-        }.register(object : River.PacketListener {
-            override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
-                appStates.up(packet["app_name"].asText(), packet["instance_id"].asText(), packet["@opprettet"].asLocalDateTime())
-            }
+        }.register(
+            object : River.PacketListener {
+                override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
+                    appStates.up(packet["app_name"].asText(), packet["instance_id"].asText(), packet["@opprettet"].asLocalDateTime())
+                }
 
-            override fun onError(problems: MessageProblems, context: RapidsConnection.MessageContext) {
-                logger.error("forstod ikke application_up:\n${problems.toExtendedReport()}")
+                override fun onError(problems: MessageProblems, context: RapidsConnection.MessageContext) {
+                    logger.error("forstod ikke application_up:\n${problems.toExtendedReport()}")
+                }
             }
-        })
+        )
 
         River(this).apply {
             validate { it.demandValue("@event_name", "pong") }
             validate { it.requireKey("app_name", "instance_id") }
             validate { it.require("ping_time", JsonNode::asLocalDateTime) }
             validate { it.require("pong_time", JsonNode::asLocalDateTime) }
-        }.register(object : River.PacketListener {
-            override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
-                val app = packet["app_name"].asText()
-                val instance = packet["instance_id"].asText()
-                val pingTime = packet["ping_time"].asLocalDateTime()
-                val pongTime = packet["pong_time"].asLocalDateTime()
+        }.register(
+            object : River.PacketListener {
+                override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
+                    val app = packet["app_name"].asText()
+                    val instance = packet["instance_id"].asText()
+                    val pingTime = packet["ping_time"].asLocalDateTime()
+                    val pongTime = packet["pong_time"].asLocalDateTime()
 
-                logger.info("{}-{} svarte på ping etter {} sekunder", app, instance, SECONDS.between(pingTime, pongTime))
-                appStates.up(app, instance, pongTime)
-            }
+                    logger.info("{}-{} svarte på ping etter {} sekunder", app, instance, SECONDS.between(pingTime, pongTime))
+                    appStates.up(app, instance, pongTime)
+                }
 
-            override fun onError(problems: MessageProblems, context: RapidsConnection.MessageContext) {
-                logger.error("forstod ikke pong:\n${problems.toExtendedReport()}")
+                override fun onError(problems: MessageProblems, context: RapidsConnection.MessageContext) {
+                    logger.error("forstod ikke pong:\n${problems.toExtendedReport()}")
+                }
             }
-        })
+        )
 
         River(this).apply {
             validate { it.demandValue("@event_name", "application_down") }
             validate { it.requireKey("app_name", "instance_id") }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-        }.register(object : River.PacketListener {
-            override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
-                appStates.down(packet["app_name"].asText(), packet["instance_id"].asText(), packet["@opprettet"].asLocalDateTime())
-            }
+        }.register(
+            object : River.PacketListener {
+                override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
+                    appStates.down(packet["app_name"].asText(), packet["instance_id"].asText(), packet["@opprettet"].asLocalDateTime())
+                }
 
-            override fun onError(problems: MessageProblems, context: RapidsConnection.MessageContext) {
-                logger.error("forstod ikke application_down:\n${problems.toExtendedReport()}")
+                override fun onError(problems: MessageProblems, context: RapidsConnection.MessageContext) {
+                    logger.error("forstod ikke application_down:\n${problems.toExtendedReport()}")
+                }
             }
-        })
+        )
     }.start()
 }
 
