@@ -26,9 +26,9 @@ spec:
   filesFrom:
     - secret: serviceuser-srvdp-speider
       mountPath: "/var/run/secrets/nais.io/service_user"
+  envFrom:
+    - configmap: kafka-bootstrap-servers
   env:
-    - name: KAFKA_BOOTSTRAP_SERVERS
-      value: {{kafka_service_brokers}}
     - name: KAFKA_CONSUMER_GROUP_ID
       value: dp-speider-v1
     - name: KAFKA_RAPID_TOPIC

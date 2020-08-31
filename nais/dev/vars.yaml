@@ -1,5 +1,4 @@
 app: dp-speider
 namespace: teamdagpenger
 team: teamdagpenger
-kafka_service_brokers: b27apvl00045.preprod.local:8443,b27apvl00046.preprod.local:8443,b27apvl00047.preprod.local:8443
 alerts_slack_channel: "#team-dagpenger-alert-non-prod"
