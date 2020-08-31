@@ -1,0 +1,35 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ app }}
+  namespace: {{ team }}
+  labels:
+    team: {{ team }}
+spec:
+  image: {{ image }}
+  port: 8080
+  prometheus:
+    enabled: false
+    path: /metrics
+  replicas:
+    min: 1
+    max: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  secureLogs:
+    enabled: true
+  filesFrom:
+    - secret: serviceuser-srvdp-speider
+      mountPath: "/var/run/secrets/nais.io/service_user"
+  env:
+    - name: KAFKA_BOOTSTRAP_SERVERS
+      value: {{kafka_service_brokers}}
+    - name: KAFKA_CONSUMER_GROUP_ID
+      value: dp-speider-v1
+    - name: KAFKA_RAPID_TOPIC
+      value: privat-dagpenger-behov-v2
