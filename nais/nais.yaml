@@ -1,10 +1,10 @@
 apiVersion: nais.io/v1alpha1
 kind: Application
 metadata:
-  name: {{ app }}
-  namespace: {{ team }}
+  name: dp-speider
+  namespace: teamdagpenger
   labels:
-    team: {{ team }}
+    team: teamdagpenger
 spec:
   image: {{ image }}
   port: 8080
