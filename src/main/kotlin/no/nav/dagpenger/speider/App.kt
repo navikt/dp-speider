@@ -9,6 +9,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.time.delay
 import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -53,11 +54,11 @@ fun main() {
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
         }.register(
             object : River.PacketListener {
-                override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
+                override fun onPacket(packet: JsonMessage, context: MessageContext) {
                     appStates.up(packet["app_name"].asText(), packet["instance_id"].asText(), packet["@opprettet"].asLocalDateTime())
                 }
 
-                override fun onError(problems: MessageProblems, context: RapidsConnection.MessageContext) {
+                override fun onError(problems: MessageProblems, context: MessageContext) {
                     logger.error("forstod ikke application_up:\n${problems.toExtendedReport()}")
                 }
             }
@@ -70,7 +71,7 @@ fun main() {
             validate { it.require("pong_time", JsonNode::asLocalDateTime) }
         }.register(
             object : River.PacketListener {
-                override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
+                override fun onPacket(packet: JsonMessage, context: MessageContext) {
                     val app = packet["app_name"].asText()
                     val instance = packet["instance_id"].asText()
                     val pingTime = packet["ping_time"].asLocalDateTime()
@@ -80,7 +81,7 @@ fun main() {
                     appStates.up(app, instance, pongTime)
                 }
 
-                override fun onError(problems: MessageProblems, context: RapidsConnection.MessageContext) {
+                override fun onError(problems: MessageProblems, context: MessageContext) {
                     logger.error("forstod ikke pong:\n${problems.toExtendedReport()}")
                 }
             }
@@ -92,11 +93,11 @@ fun main() {
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
         }.register(
             object : River.PacketListener {
-                override fun onPacket(packet: JsonMessage, context: RapidsConnection.MessageContext) {
+                override fun onPacket(packet: JsonMessage, context: MessageContext) {
                     appStates.down(packet["app_name"].asText(), packet["instance_id"].asText(), packet["@opprettet"].asLocalDateTime())
                 }
 
-                override fun onError(problems: MessageProblems, context: RapidsConnection.MessageContext) {
+                override fun onError(problems: MessageProblems, context: MessageContext) {
                     logger.error("forstod ikke application_down:\n${problems.toExtendedReport()}")
                 }
             }
@@ -203,8 +204,8 @@ internal class AppStates {
                     sb.append("\t")
                         .append(app.name)
                         .append(": ")
-                        .appendln(if (Instance.up(app.instances, threshold)) "UP" else "DOWN")
-                    app.instances.forEach { sb.append("\t\t").appendln(it.toString()) }
+                        .appendLine(if (Instance.up(app.instances, threshold)) "UP" else "DOWN")
+                    app.instances.forEach { sb.append("\t\t").appendLine(it.toString()) }
                 }
                 return sb.toString()
             }
