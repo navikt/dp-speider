@@ -32,6 +32,6 @@ spec:
     - name: KAFKA_CONSUMER_GROUP_ID
       value: dp-speider-v1
     - name: KAFKA_RAPID_TOPIC
-      value: privat-dagpenger-behov-v2
-    - name: KAFKA_PREFER_ON_PREM
-      value: "true"
+      value: teamdagpenger.rapid.v1
+  kafka:
+    pool: {{ kafka_pool }}
