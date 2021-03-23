@@ -9,7 +9,7 @@ spec:
   image: {{ image }}
   port: 8080
   prometheus:
-    enabled: false
+    enabled: true
     path: /metrics
   replicas:
     min: 1
