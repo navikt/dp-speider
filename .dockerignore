@@ -1,5 +1,5 @@
 # Ignore everything
 **
 
-# Except shadow jar
-!build/libs/*-all.jar
+# Except jar
+!build/libs/dp-speider.jar

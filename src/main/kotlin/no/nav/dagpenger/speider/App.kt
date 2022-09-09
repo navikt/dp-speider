@@ -3,6 +3,7 @@ package no.nav.dagpenger.speider
 import com.fasterxml.jackson.databind.JsonNode
 import io.prometheus.client.Gauge
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
@@ -26,6 +27,7 @@ private val stateGauge = Gauge.build("dp_app_status", "Gjeldende status på apps
     .register()
 private val logger = LoggerFactory.getLogger("no.nav.dagpenger.speider.App")
 
+@OptIn(DelicateCoroutinesApi::class)
 fun main() {
     val env = System.getenv()
 
