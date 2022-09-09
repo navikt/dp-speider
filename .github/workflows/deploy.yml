@@ -30,7 +30,7 @@ jobs:
         run: ./gradlew build --info
 
       - name: Build and Publish Docker image
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -39,7 +39,7 @@ jobs:
           docker push $IMAGE
 
       - name: Archive NAIS yaml
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v1
         with:
           name: nais-yaml
@@ -47,7 +47,7 @@ jobs:
   deploy-dev:
     name: Deploy to dev-gcp
     needs: [build]
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Fetch NAIS yaml
@@ -67,7 +67,7 @@ jobs:
   deploy-prod:
     name: Deploy to Production(gcp)
     needs: [deploy-dev]
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Fetch NAIS yaml
