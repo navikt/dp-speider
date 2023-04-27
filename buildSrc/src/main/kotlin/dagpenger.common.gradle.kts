@@ -7,10 +7,8 @@ plugins {
     id("dagpenger.spotless")
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
+kotlin {
+    jvmToolchain(17)
 }
 
 repositories {
@@ -34,9 +32,5 @@ tasks {
             exceptionFormat = TestExceptionFormat.FULL
             events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
         }
-    }
-
-    withType<KotlinCompile>().all {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_16.toString()
     }
 }
