@@ -47,7 +47,7 @@ fun main() {
                     scheduledPingJob?.cancel()
                     statusPrinterJob?.cancel()
                 }
-            }
+            },
         )
 
         River(this).apply {
@@ -63,7 +63,7 @@ fun main() {
                 override fun onError(problems: MessageProblems, context: MessageContext) {
                     logger.error("forstod ikke application_up:\n${problems.toExtendedReport()}")
                 }
-            }
+            },
         )
 
         River(this).apply {
@@ -86,7 +86,7 @@ fun main() {
                 override fun onError(problems: MessageProblems, context: MessageContext) {
                     logger.error("forstod ikke pong:\n${problems.toExtendedReport()}")
                 }
-            }
+            },
         )
 
         River(this).apply {
@@ -102,7 +102,7 @@ fun main() {
                 override fun onError(problems: MessageProblems, context: MessageContext) {
                     logger.error("forstod ikke application_down:\n${problems.toExtendedReport()}")
                 }
-            }
+            },
         )
     }.start()
 }
@@ -128,11 +128,11 @@ private suspend fun CoroutineScope.printerJob(rapidsConnection: RapidsConnection
                             mapOf<String, Any>(
                                 "app" to it.key,
                                 "state" to it.value.first,
-                                "last_active_time" to it.value.second
+                                "last_active_time" to it.value.second,
                             )
-                        }
-                    )
-                ).toJson()
+                        },
+                    ),
+                ).toJson(),
             )
         }
     }
@@ -180,7 +180,7 @@ internal class AppStates {
     private class App(
         private val name: String,
         private val instances: MutableList<Instance> = mutableListOf(),
-        private var time: LocalDateTime
+        private var time: LocalDateTime,
     ) {
         internal companion object {
             fun up(states: List<App>, app: String, threshold: LocalDateTime) =
