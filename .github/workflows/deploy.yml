@@ -28,8 +28,8 @@ jobs:
           byosbom: dependency-graph-reports/deploy-build.json
           team: teamdagpenger
           tag: ${{ github.sha }}
-          dockerfile: mediator/Dockerfile # optional, default Dockerfile
-          docker_context: mediator # optional, default .
+          dockerfile: Dockerfile # optional, default Dockerfile
+          docker_context: . # optional, default .
           identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
           project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
 
