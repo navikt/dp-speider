@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 internal class AppStatesTest {
-
     private companion object {
         private const val APP = "my-app"
         private const val INSTANCE_1 = "instance1"
