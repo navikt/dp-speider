@@ -97,7 +97,11 @@ fun main() {
                     packet: JsonMessage,
                     context: MessageContext,
                 ) {
-                    appStates.up(packet["app_name"].asText(), packet["instance_id"].asText(), packet["@opprettet"].asLocalDateTime())
+                    appStates.up(
+                        packet["app_name"].asText(),
+                        packet["instance_id"].asText(),
+                        packet["@opprettet"].asLocalDateTime(),
+                    )
                 }
 
                 override fun onError(
@@ -125,7 +129,12 @@ fun main() {
                     val pingTime = packet["ping_time"].asLocalDateTime()
                     val pongTime = packet["pong_time"].asLocalDateTime()
 
-                    logger.info("{}-{} svarte på ping etter {} sekunder", app, instance, SECONDS.between(pingTime, pongTime))
+                    logger.info(
+                        "{}-{} svarte på ping etter {} sekunder",
+                        app,
+                        instance,
+                        SECONDS.between(pingTime, pongTime),
+                    )
                     appStates.ping(app, instance, pongTime)
                 }
 
@@ -148,7 +157,11 @@ fun main() {
                     packet: JsonMessage,
                     context: MessageContext,
                 ) {
-                    appStates.down(packet["app_name"].asText(), packet["instance_id"].asText(), packet["@opprettet"].asLocalDateTime())
+                    appStates.down(
+                        packet["app_name"].asText(),
+                        packet["instance_id"].asText(),
+                        packet["@opprettet"].asLocalDateTime(),
+                    )
                 }
 
                 override fun onError(
@@ -170,7 +183,11 @@ fun main() {
                     packet: JsonMessage,
                     context: MessageContext,
                 ) {
-                    appStates.down(packet["app_name"].asText(), packet["instance_id"].asText(), packet["@opprettet"].asLocalDateTime())
+                    appStates.down(
+                        packet["app_name"].asText(),
+                        packet["instance_id"].asText(),
+                        packet["@opprettet"].asLocalDateTime(),
+                    )
                 }
 
                 override fun onError(
@@ -205,7 +222,7 @@ private suspend fun CoroutineScope.printerJob(
                         "threshold" to threshold,
                         "states" to
                             report.map { (appName, info) ->
-                                mapOf<String, Any>(
+                                mapOf(
                                     "app" to appName,
                                     "state" to info.first.toInt(),
                                     "last_active_time" to info.second,
@@ -325,6 +342,7 @@ internal class AppStates {
             ) {
                 val app = findOrCreateApp(states, appName, time)
                 if (app.downInstances.any { it.first == instance }) return // don't re-active a downed app
+                // remove all apps
                 app.downInstances.removeAll { it.second < LocalDateTime.now().minusHours(6) }
                 Instance.up(app.instances, instance, time)
             }
@@ -343,9 +361,14 @@ internal class AppStates {
             fun instances(
                 states: List<App>,
                 threshold: LocalDateTime,
-            ): Map<String, Triple<Boolean, LocalDateTime, List<Triple<String, LocalDateTime, Boolean>>>> {
+            ): Map<String, Triple<Boolean, LocalDateTime, List<Instance.Report>>> {
                 return states.associate { app ->
-                    app.name to Triple(Instance.up(app.instances, threshold), app.time, Instance.list(app.instances, threshold))
+                    app.name to
+                        Triple(
+                            Instance.up(app.instances, threshold),
+                            app.time,
+                            Instance.list(app.instances, threshold),
+                        )
                 }
             }
 
@@ -379,18 +402,24 @@ internal class AppStates {
         }
     }
 
-    private class Instance(private val id: String, private var time: LocalDateTime) {
+    internal class Instance(private val id: String, private var time: LocalDateTime) {
         override fun toString(): String {
             return "$id: last active at ${time.format(timestampFormat)}"
         }
 
         fun up(threshold: LocalDateTime) = time >= threshold
 
+        data class Report(
+            val id: String,
+            val time: LocalDateTime,
+            val isUp: Boolean,
+        )
+
         companion object {
             fun list(
                 list: List<Instance>,
                 threshold: LocalDateTime,
-            ) = list.map { Triple(it.id, it.time, it.up(threshold)) }
+            ) = list.map { Report(it.id, it.time, it.up(threshold)) }
 
             fun up(
                 list: MutableList<Instance>,
