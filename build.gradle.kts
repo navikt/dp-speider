@@ -7,6 +7,7 @@ plugins {
 
 dependencies {
     implementation(libs.rapids.and.rivers)
+    implementation(libs.kotlin.logging)
 }
 
 application {
