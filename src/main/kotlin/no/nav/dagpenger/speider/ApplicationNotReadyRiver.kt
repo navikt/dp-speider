@@ -27,7 +27,7 @@ internal class ApplicationNotReadyRiver(
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        val instance = packet["@instance_id"].asText()
+        val instance = packet["instance_id"].asText()
         val app = packet["app_name"].asText()
         logger.info { "application_not_ready: $app - $instance" }
         appStates.down(
