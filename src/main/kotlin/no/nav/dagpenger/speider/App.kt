@@ -81,6 +81,7 @@ fun main() {
         )
 
         ApplicationUpRiver(this, appStates)
+        ApplicationNotReadyRiver(this, appStates)
         ApplicationPongRiver(this, appStates)
         ApplicationDownRiver(this, appStates)
         ApplicationStopRiver(this, appStates)
