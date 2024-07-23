@@ -16,13 +16,11 @@ repositories {
 }
 
 dependencies {
-    implementation(platform(kotlin("bom")))
-    implementation(kotlin("stdlib-jdk8"))
     testImplementation(kotlin("test"))
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 tasks.test {
