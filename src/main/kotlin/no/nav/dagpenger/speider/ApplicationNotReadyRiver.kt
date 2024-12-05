@@ -1,13 +1,15 @@
 package no.nav.dagpenger.speider
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import mu.KotlinLogging
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.MessageProblems
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDateTime
 
 internal class ApplicationNotReadyRiver(
     rapidsConnection: RapidsConnection,
@@ -17,7 +19,7 @@ internal class ApplicationNotReadyRiver(
 
     init {
         River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "application_not_ready") }
+            precondition { it.requireValue("@event_name", "application_not_ready") }
             validate { it.requireKey("app_name", "instance_id") }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
         }.register(this)
@@ -26,6 +28,8 @@ internal class ApplicationNotReadyRiver(
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
     ) {
         val instance = packet["instance_id"].asText()
         val app = packet["app_name"].asText()
@@ -40,6 +44,7 @@ internal class ApplicationNotReadyRiver(
     override fun onError(
         problems: MessageProblems,
         context: MessageContext,
+        metadata: MessageMetadata,
     ) {
         logger.error("forstod ikke application_not_ready:\n${problems.toExtendedReport()}")
     }

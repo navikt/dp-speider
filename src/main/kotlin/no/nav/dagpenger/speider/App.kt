@@ -1,6 +1,8 @@
 package no.nav.dagpenger.speider
 
-import io.prometheus.client.Gauge
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.prometheus.metrics.core.metrics.Gauge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -8,9 +10,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.time.delay
-import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.helse.rapids_rivers.RapidsConnection
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.clients.admin.AdminClient
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -26,7 +26,7 @@ import java.util.Properties
 import java.util.UUID
 
 private val stateGauge =
-    Gauge.build("dp_app_status", "Gjeldende status på apps")
+    Gauge.builder().name("dp_app_status").help("Gjeldende status på apps")
         .labelNames("appnavn")
         .register()
 private val logger = LoggerFactory.getLogger("no.nav.dagpenger.speider.App")
@@ -99,7 +99,7 @@ private suspend fun CoroutineScope.printerJob(
         val threshold = LocalDateTime.now().minusMinutes(1)
         logger.info(appStates.reportString(threshold))
         appStates.report(threshold).onEach { (app, state) ->
-            stateGauge.labels(app).set(state.toInt().toDouble())
+            stateGauge.labelValues(app).set(state.toInt().toDouble())
         }
         appStates.instances(threshold).also { report ->
             rapidsConnection.publish(
