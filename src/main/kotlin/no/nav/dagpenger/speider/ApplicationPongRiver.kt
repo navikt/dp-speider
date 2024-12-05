@@ -1,13 +1,15 @@
 package no.nav.dagpenger.speider
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import mu.KotlinLogging
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.MessageProblems
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDateTime
 import java.time.temporal.ChronoUnit
 
 internal class ApplicationPongRiver(
@@ -18,7 +20,7 @@ internal class ApplicationPongRiver(
 
     init {
         River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "pong") }
+            precondition { it.requireValue("@event_name", "pong") }
             validate { it.requireKey("app_name", "instance_id") }
             validate { it.require("ping_time", JsonNode::asLocalDateTime) }
             validate { it.require("pong_time", JsonNode::asLocalDateTime) }
@@ -28,6 +30,8 @@ internal class ApplicationPongRiver(
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
     ) {
         val app = packet["app_name"].asText()
         val instance = packet["instance_id"].asText()
@@ -46,6 +50,7 @@ internal class ApplicationPongRiver(
     override fun onError(
         problems: MessageProblems,
         context: MessageContext,
+        metadata: MessageMetadata,
     ) {
         logger.error("forstod ikke pong:\n${problems.toExtendedReport()}")
     }
