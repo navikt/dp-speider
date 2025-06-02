@@ -34,3 +34,11 @@ spec:
       value: teamdagpenger.rapid.v1
   kafka:
     pool: "{{ kafka_pool }}"
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+    autoInstrumentation:
+      enabled: true
+      runtime: java
