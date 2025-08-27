@@ -18,11 +18,12 @@ internal class ApplicationUpRiver(
     private val logger = KotlinLogging.logger { }
 
     init {
-        River(rapidsConnection).apply {
-            precondition { it.requireValue("@event_name", "application_up") }
-            validate { it.requireKey("app_name", "instance_id") }
-            validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                precondition { it.requireValue("@event_name", "application_up") }
+                validate { it.requireKey("app_name", "instance_id") }
+                validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
+            }.register(this)
     }
 
     override fun onPacket(
@@ -43,6 +44,6 @@ internal class ApplicationUpRiver(
         context: MessageContext,
         metadata: MessageMetadata,
     ) {
-        logger.error("forstod ikke application_up:\n${problems.toExtendedReport()}")
+        logger.error { "forstod ikke application_up:\n${problems.toExtendedReport()}" }
     }
 }

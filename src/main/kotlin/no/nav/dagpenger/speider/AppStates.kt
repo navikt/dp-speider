@@ -41,15 +41,11 @@ internal class AppStates {
         App.down(states, app, instance, time)
     }
 
-    fun report(threshold: LocalDateTime): Map<String, Boolean> {
-        return instances(threshold).mapValues { it.value.first }
-    }
+    fun report(threshold: LocalDateTime): Map<String, Boolean> = instances(threshold).mapValues { it.value.first }
 
     fun instances(threshold: LocalDateTime) = App.instances(states, threshold)
 
-    fun reportString(threshold: LocalDateTime): String {
-        return App.reportString(states, threshold)
-    }
+    fun reportString(threshold: LocalDateTime): String = App.reportString(states, threshold)
 
     private class App(
         private val name: String,
@@ -104,8 +100,8 @@ internal class AppStates {
             fun instances(
                 states: List<App>,
                 threshold: LocalDateTime,
-            ): Map<String, Triple<Boolean, LocalDateTime, List<Instance.Report>>> {
-                return states.associate { app ->
+            ): Map<String, Triple<Boolean, LocalDateTime, List<Instance.Report>>> =
+                states.associate { app ->
                     app.name to
                         Triple(
                             Instance.up(app.instances, threshold),
@@ -113,7 +109,6 @@ internal class AppStates {
                             Instance.list(app.instances, threshold),
                         )
                 }
-            }
 
             fun reportString(
                 states: List<App>,
@@ -122,7 +117,8 @@ internal class AppStates {
                 val sb = StringBuffer()
                 sb.append("Application states since ${threshold.format(timestampFormat)}:\n")
                 states.forEach { app ->
-                    sb.append("\t")
+                    sb
+                        .append("\t")
                         .append(app.name)
                         .append(": ")
                         .appendLine(if (Instance.up(app.instances, threshold)) "UP" else "DOWN")
@@ -135,20 +131,20 @@ internal class AppStates {
                 states: MutableList<App>,
                 app: String,
                 time: LocalDateTime,
-            ): App {
-                return states.firstOrNull { it.name == app }?.also {
+            ): App =
+                states.firstOrNull { it.name == app }?.also {
                     it.time = maxOf(it.time, time)
                 } ?: App(app, mutableListOf(), time).also {
                     states.add(it)
                 }
-            }
         }
     }
 
-    internal class Instance(private val id: String, private var time: LocalDateTime) {
-        override fun toString(): String {
-            return "$id: last active at ${time.format(timestampFormat)}"
-        }
+    internal class Instance(
+        private val id: String,
+        private var time: LocalDateTime,
+    ) {
+        override fun toString(): String = "$id: last active at ${time.format(timestampFormat)}"
 
         fun up(threshold: LocalDateTime) = time >= threshold
 

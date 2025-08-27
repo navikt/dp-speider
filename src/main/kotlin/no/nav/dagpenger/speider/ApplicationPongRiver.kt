@@ -19,12 +19,13 @@ internal class ApplicationPongRiver(
     private val logger = KotlinLogging.logger { }
 
     init {
-        River(rapidsConnection).apply {
-            precondition { it.requireValue("@event_name", "pong") }
-            validate { it.requireKey("app_name", "instance_id") }
-            validate { it.require("ping_time", JsonNode::asLocalDateTime) }
-            validate { it.require("pong_time", JsonNode::asLocalDateTime) }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                precondition { it.requireValue("@event_name", "pong") }
+                validate { it.requireKey("app_name", "instance_id") }
+                validate { it.require("ping_time", JsonNode::asLocalDateTime) }
+                validate { it.require("pong_time", JsonNode::asLocalDateTime) }
+            }.register(this)
     }
 
     override fun onPacket(
@@ -38,12 +39,9 @@ internal class ApplicationPongRiver(
         val pingTime = packet["ping_time"].asLocalDateTime()
         val pongTime = packet["pong_time"].asLocalDateTime()
 
-        logger.info(
-            "{}-{} svarte på ping etter {} sekunder",
-            app,
-            instance,
-            ChronoUnit.SECONDS.between(pingTime, pongTime),
-        )
+        logger.info {
+            "$app-$instance svarte på ping etter ${ChronoUnit.SECONDS.between(pingTime, pongTime)} sekunder"
+        }
         appStates.ping(app, instance, pongTime)
     }
 
@@ -52,6 +50,6 @@ internal class ApplicationPongRiver(
         context: MessageContext,
         metadata: MessageMetadata,
     ) {
-        logger.error("forstod ikke pong:\n${problems.toExtendedReport()}")
+        logger.error { "forstod ikke pong:\n${problems.toExtendedReport()}" }
     }
 }

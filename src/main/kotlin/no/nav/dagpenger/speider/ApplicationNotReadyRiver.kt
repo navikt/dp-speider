@@ -18,11 +18,12 @@ internal class ApplicationNotReadyRiver(
     private val logger = KotlinLogging.logger { }
 
     init {
-        River(rapidsConnection).apply {
-            precondition { it.requireValue("@event_name", "application_not_ready") }
-            validate { it.requireKey("app_name", "instance_id") }
-            validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                precondition { it.requireValue("@event_name", "application_not_ready") }
+                validate { it.requireKey("app_name", "instance_id") }
+                validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
+            }.register(this)
     }
 
     override fun onPacket(
@@ -46,6 +47,6 @@ internal class ApplicationNotReadyRiver(
         context: MessageContext,
         metadata: MessageMetadata,
     ) {
-        logger.error("forstod ikke application_not_ready:\n${problems.toExtendedReport()}")
+        logger.error { "forstod ikke application_not_ready:\n${problems.toExtendedReport()}" }
     }
 }

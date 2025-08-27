@@ -26,7 +26,10 @@ import java.util.Properties
 import java.util.UUID
 
 private val stateGauge =
-    Gauge.builder().name("dp_app_status").help("Gjeldende status på apps")
+    Gauge
+        .builder()
+        .name("dp_app_status")
+        .help("Gjeldende status på apps")
         .labelNames("appnavn")
         .register()
 private val logger = LoggerFactory.getLogger("no.nav.dagpenger.speider.App")
@@ -52,7 +55,8 @@ fun main() {
 
     val topic = env.getValue("KAFKA_RAPID_TOPIC")
     val partitionsCount =
-        adminClient.describeTopics(listOf(topic))
+        adminClient
+            .describeTopics(listOf(topic))
             .allTopicNames()
             .get()
             .getValue(topic)
@@ -65,27 +69,30 @@ fun main() {
     var scheduledPingJob: Job? = null
     var statusPrinterJob: Job? = null
 
-    RapidApplication.create(env).apply {
-        register(
-            object : RapidsConnection.StatusListener {
-                override fun onStartup(rapidsConnection: RapidsConnection) {
-                    statusPrinterJob = GlobalScope.launch { printerJob(rapidsConnection, appStates) }
-                    scheduledPingJob = GlobalScope.launch { pinger(pingProducer, topic, partitionsCount) }
-                }
+    RapidApplication
+        .create(env)
+        .apply {
+            register(
+                object : RapidsConnection.StatusListener {
+                    override fun onStartup(rapidsConnection: RapidsConnection) {
+                        statusPrinterJob = GlobalScope.launch { printerJob(rapidsConnection, appStates) }
+                        scheduledPingJob = GlobalScope.launch { pinger(pingProducer, topic, partitionsCount) }
+                    }
 
-                override fun onShutdown(rapidsConnection: RapidsConnection) {
-                    scheduledPingJob?.cancel()
-                    statusPrinterJob?.cancel()
-                }
-            },
-        )
+                    override fun onShutdown(rapidsConnection: RapidsConnection) {
+                        scheduledPingJob?.cancel()
+                        statusPrinterJob?.cancel()
+                    }
+                },
+            )
 
-        ApplicationUpRiver(this, appStates)
-        ApplicationNotReadyRiver(this, appStates)
-        ApplicationPongRiver(this, appStates)
-        ApplicationDownRiver(this, appStates)
-        ApplicationStopRiver(this, appStates)
-    }.start()
+            ApplicationUpRiver(this, appStates)
+            ApplicationNotReadyRiver(this, appStates)
+            ApplicationPongRiver(this, appStates)
+            ApplicationDownRiver(this, appStates)
+            ApplicationStopRiver(this, appStates)
+            SystemReadCountOvervåker(this, maxReadCount = 10)
+        }.start()
 }
 
 private fun Boolean.toInt() = if (this) 1 else 0
@@ -103,28 +110,29 @@ private suspend fun CoroutineScope.printerJob(
         }
         appStates.instances(threshold).also { report ->
             rapidsConnection.publish(
-                JsonMessage.newMessage(
-                    "app_status",
-                    mapOf(
-                        "threshold" to threshold,
-                        "states" to
-                            report.map { (appName, info) ->
-                                mapOf(
-                                    "app" to appName,
-                                    "state" to info.first.toInt(),
-                                    "last_active_time" to info.second,
-                                    "instances" to
-                                        info.third.map { (instanceId, lastActive, isUp) ->
-                                            mapOf(
-                                                "instance" to instanceId,
-                                                "last_active_time" to lastActive,
-                                                "state" to isUp.toInt(),
-                                            )
-                                        },
-                                )
-                            },
-                    ),
-                ).toJson(),
+                JsonMessage
+                    .newMessage(
+                        "app_status",
+                        mapOf(
+                            "threshold" to threshold,
+                            "states" to
+                                report.map { (appName, info) ->
+                                    mapOf(
+                                        "app" to appName,
+                                        "state" to info.first.toInt(),
+                                        "last_active_time" to info.second,
+                                        "instances" to
+                                            info.third.map { (instanceId, lastActive, isUp) ->
+                                                mapOf(
+                                                    "instance" to instanceId,
+                                                    "last_active_time" to lastActive,
+                                                    "state" to isUp.toInt(),
+                                                )
+                                            },
+                                    )
+                                },
+                        ),
+                    ).toJson(),
             )
         }
     }
