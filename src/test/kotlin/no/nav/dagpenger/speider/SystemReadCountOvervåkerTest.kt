@@ -7,7 +7,7 @@ import kotlin.test.Test
 class SystemReadCountOvervåkerTest {
     private val testRapid = TestRapid()
 
-    private val overvåker = SystemReadCountOvervåker(testRapid, maxReadCount = 1)
+    private val overvåker = SystemReadCountOvervåker(testRapid, maxReadCount = -1)
 
     @Test
     fun `leser`() {
@@ -19,6 +19,6 @@ class SystemReadCountOvervåkerTest {
                     ),
             )
 
-        testRapid.sendTestMessage(message.toJson().also { println(it) })
+        testRapid.sendTestMessage(message.toJson())
     }
 }
