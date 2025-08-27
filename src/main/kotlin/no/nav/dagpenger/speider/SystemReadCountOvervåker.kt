@@ -13,15 +13,16 @@ class SystemReadCountOvervåker(
     private val maxReadCount: Int = 30,
 ) : River.PacketListener {
     init {
-        River(rapidsConnection).apply {
-            precondition { it.requireKey("system_read_count", "@opprettet") }
-            precondition {
-                it.require("system_read_count") { readCount ->
-                    readCount.asInt() > maxReadCount
+        River(rapidsConnection)
+            .apply {
+                precondition { it.requireKey("system_read_count", "@opprettet") }
+                precondition {
+                    it.require("system_read_count") { readCount ->
+                        readCount.asInt() > maxReadCount
+                    }
                 }
-            }
-            validate { it.interestedIn("@event_name", "system_participating_services", "@id") }
-        }
+                validate { it.interestedIn("@event_name", "system_participating_services", "@id") }
+            }.register(this)
     }
 
     private val logger = KotlinLogging.logger {}

@@ -19,6 +19,6 @@ class SystemReadCountOvervåkerTest {
                     ),
             )
 
-        testRapid.sendTestMessage(message.toJson())
+        testRapid.sendTestMessage(message.toJson().also { println(it) })
     }
 }
