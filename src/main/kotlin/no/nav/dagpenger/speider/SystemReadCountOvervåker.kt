@@ -16,11 +16,6 @@ class SystemReadCountOvervåker(
         River(rapidsConnection)
             .apply {
                 precondition { it.requireKey("system_read_count", "@opprettet") }
-                precondition {
-                    it.require("system_read_count") { readCount ->
-                        readCount.asInt() > maxReadCount
-                    }
-                }
                 validate { it.interestedIn("@event_name", "system_participating_services", "@id") }
             }.register(this)
     }
@@ -33,12 +28,14 @@ class SystemReadCountOvervåker(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        logger.warn {
-            """Høy system_read_count oppdaget: ${packet["system_read_count"].asInt()} (max: $maxReadCount)
+        if (packet["system_read_count"].asInt() > maxReadCount) {
+            logger.warn {
+                """Høy system_read_count oppdaget: ${packet["system_read_count"].asInt()} (max: $maxReadCount)
                 |@opprettet: ${packet["@opprettet"].asText()}
                 |@event_name: ${packet["@event_name"].asText("ukjent")}
                 |@id: ${packet["@id"].asText("ukjent")}
-            """.trimMargin()
+                """.trimMargin()
+            }
         }
     }
 }
