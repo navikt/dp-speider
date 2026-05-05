@@ -10,7 +10,7 @@ plugins {
 
 dependencies {
     implementation(libs.rapids.and.rivers)
-    implementation("io.prometheus:prometheus-metrics-core:1.6.0")
+    implementation("io.prometheus:prometheus-metrics-core:1.6.1")
     testImplementation(libs.rapids.and.rivers.test)
     implementation(libs.kotlin.logging)
 }
