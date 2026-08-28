@@ -1,6 +1,5 @@
 package no.nav.dagpenger.speider
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
@@ -10,6 +9,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
+import tools.jackson.databind.JsonNode
 import java.time.temporal.ChronoUnit
 
 internal class ApplicationPongRiver(
@@ -34,8 +34,8 @@ internal class ApplicationPongRiver(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val app = packet["app_name"].asText()
-        val instance = packet["instance_id"].asText()
+        val app = packet["app_name"].asString()
+        val instance = packet["instance_id"].asString()
         val pingTime = packet["ping_time"].asLocalDateTime()
         val pongTime = packet["pong_time"].asLocalDateTime()
 

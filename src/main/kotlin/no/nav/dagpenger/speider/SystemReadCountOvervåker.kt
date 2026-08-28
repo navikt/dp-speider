@@ -38,7 +38,7 @@ class SystemReadCountOvervåker(
                      |Opprettet: ${pakka.opprettet}
                      |Systemer involvert og deres read-tidspunkt:
                      |${pakka.apperInvolvert.joinToString(separator = "\n") { (name, time) -> "  - $name: $time" }}
-                     |Hendelse-ID: ${packet["@id"].asText()}
+                     |Hendelse-ID: ${packet["@id"].asString()}
                 """.trimMargin()
             }
         }
@@ -51,11 +51,11 @@ private data class Pakka(
     private val packet: JsonMessage,
 ) {
     val readCount: Int = packet["system_read_count"].asInt()
-    val eventName: String = packet["@event_name"].asText("ukjent")
+    val eventName: String = packet["@event_name"].asString("ukjent")
     val opprettet: LocalDateTime = packet["@opprettet"].asLocalDateTime()
     val apperInvolvert: List<App> =
-        packet["system_participating_services"].map {
-            val navn = if (it.has("service")) it["service"].asText() else "ukjent"
+        packet["system_participating_services"].toList().map {
+            val navn = if (it.has("service")) it["service"].asString() else "ukjent"
             navn to it["time"].asLocalDateTime()
         }
 }

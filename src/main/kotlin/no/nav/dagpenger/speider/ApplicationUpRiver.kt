@@ -1,6 +1,5 @@
 package no.nav.dagpenger.speider
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
@@ -10,6 +9,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
+import tools.jackson.databind.JsonNode
 
 internal class ApplicationUpRiver(
     rapidsConnection: RapidsConnection,
@@ -33,8 +33,8 @@ internal class ApplicationUpRiver(
         meterRegistry: MeterRegistry,
     ) {
         appStates.up(
-            packet["app_name"].asText(),
-            packet["instance_id"].asText(),
+            packet["app_name"].asString(),
+            packet["instance_id"].asString(),
             packet["@opprettet"].asLocalDateTime(),
         )
     }
